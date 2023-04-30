@@ -1,4 +1,4 @@
-//© Copyright 2014-2022, Juan Linietsky, Ariel Manzur and the Godot community (CC-BY 3.0)
+//ï¿½ Copyright 2014-2022, Juan Linietsky, Ariel Manzur and the Godot community (CC-BY 3.0)
 #include "terrain_editor.h"
 
 #include <godot_cpp/core/class_db.hpp>
@@ -179,6 +179,18 @@ void Terrain3DEditor::_operate_map(Terrain3DStorage::MapType p_map_type, Vector3
 						case Terrain3DEditor::REPLACE:
 							destf = Math::lerp(srcf, h, alpha);
 							break;
+						case Terrain3DEditor::AVERAGE: {
+							// TODO: bounds check
+							Vector2i offset_x = Vector2i(1, 0);
+							Vector2i offset_y = Vector2i(0, 1);
+							float l = map->get_pixelv(map_pixel_position - offset_x).r;
+							float r = map->get_pixelv(map_pixel_position + offset_x).r;
+							float u = map->get_pixelv(map_pixel_position + offset_y).r;
+							float d = map->get_pixelv(map_pixel_position - offset_y).r;
+							float avg = (l + r + srcf + u + d) * 0.2;
+							destf = Math::lerp(srcf, avg, alpha);
+							break;
+						}
 						default:
 							break;
 					}
@@ -246,6 +258,7 @@ void Terrain3DEditor::_bind_methods() {
 	BIND_ENUM_CONSTANT(SUBTRACT);
 	BIND_ENUM_CONSTANT(MULTIPLY);
 	BIND_ENUM_CONSTANT(REPLACE);
+	BIND_ENUM_CONSTANT(AVERAGE);
 
 	BIND_ENUM_CONSTANT(REGION);
 	BIND_ENUM_CONSTANT(HEIGHT);
