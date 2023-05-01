@@ -180,14 +180,24 @@ void Terrain3DEditor::_operate_map(Terrain3DStorage::MapType p_map_type, Vector3
 							destf = Math::lerp(srcf, h, alpha);
 							break;
 						case Terrain3DEditor::AVERAGE: {
-							// TODO: bounds check
-							Vector2i offset_x = Vector2i(1, 0);
-							Vector2i offset_y = Vector2i(0, 1);
-							float l = map->get_pixelv(map_pixel_position - offset_x).r;
-							float r = map->get_pixelv(map_pixel_position + offset_x).r;
-							float u = map->get_pixelv(map_pixel_position + offset_y).r;
-							float d = map->get_pixelv(map_pixel_position - offset_y).r;
-							float avg = (l + r + srcf + u + d) * 0.2;
+							Vector2i left_pixel_position = map_pixel_position - Vector2i(1, 0);
+							Vector2i right_pixel_position = map_pixel_position + Vector2i(1, 0);
+							Vector2i down_pixel_position = map_pixel_position - Vector2i(0, 1);
+							Vector2i up_pixel_position = map_pixel_position + Vector2i(0, 1);
+							float l = srcf, r = srcf, u = srcf, d = srcf;
+							if (_is_in_bounds(left_pixel_position, Vector2i(region_size, region_size))) {
+								l = map->get_pixelv(left_pixel_position).r;
+							}
+							if (_is_in_bounds(right_pixel_position, Vector2i(region_size, region_size))) {
+								r = map->get_pixelv(right_pixel_position).r;
+							}
+							if (_is_in_bounds(down_pixel_position, Vector2i(region_size, region_size))) {
+								d = map->get_pixelv(down_pixel_position).r;
+							}
+							if (_is_in_bounds(up_pixel_position, Vector2i(region_size, region_size))) {
+								u = map->get_pixelv(up_pixel_position).r;
+							}
+							float avg = (srcf + l + r + u + d) * 0.2;
 							destf = Math::lerp(srcf, avg, alpha);
 							break;
 						}
